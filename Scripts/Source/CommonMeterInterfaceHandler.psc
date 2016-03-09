@@ -92,17 +92,30 @@ function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
 		return
 	endif
 
+	int primary_color
+	int secondary_color = -1
 	if inverted
+		primary_color = AuxPrimaryColor.GetValueInt()
+		if AuxSecondaryColor
+			secondary_color = AuxSecondaryColor.GetValueInt()
+		endif
 		if lower_is_better
 			Meter.SetPercent(1.0 - (attribute_value / meter_inversion_value))
-			SetMeterColors(AuxPrimaryColor.GetValueInt(), AuxSecondaryColor.GetValueInt())
+			SetMeterColors(primary_color, secondary_color)
 		else
 			Meter.SetPercent(attribute_value / meter_inversion_value)
-			SetMeterColors(AuxPrimaryColor.GetValueInt(), AuxSecondaryColor.GetValueInt())
+			SetMeterColors(primary_color, secondary_color)
 		endif
 	else
+		primary_color = MainPrimaryColor.GetValueInt()
+		if MainSecondaryColor
+			secondary_color = MainSecondaryColor.GetValueInt()
+		endif
+		if meter_inversion_value < 0.0
+			meter_inversion_value = 0.0
+		endif
 		Meter.SetPercent((attribute_value - meter_inversion_value) / AttributeMax.GetValue())
-		SetMeterColors(MainPrimaryColor.GetValueInt(), MainSecondaryColor.GetValueInt())
+		SetMeterColors(primary_color, secondary_color)
 	endif
 
 	last_attribute_value = attribute_value
@@ -134,6 +147,8 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 	
 	if current_zone == -1
 		; Abort and return an error. This shouldn't happen.
+		debug.trace("ERROR: CommonMeterInterfaceHandler couldn't determine the current attribute value zone. (Value: " + attribute_value + ")")
+		return
 	endif
 
 	float threshold_value = contextual_display_thresholds[current_zone]
