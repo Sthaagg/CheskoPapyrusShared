@@ -79,6 +79,8 @@ function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
 		endif
 	endif
 
+	debug.trace("DisplayMode " + DisplayMode.GetValueInt() + " abForceDisplayIfEnabled " + abForceDisplayIfEnabled + " display_iterations_remaining " + display_iterations_remaining + " inverted + " + inverted)
+
 	if DisplayMode.GetValueInt() == 1 														; Always On
 		Meter.Alpha = OpacityMax.GetValue()
 	elseif DisplayMode.GetValueInt() == 2 || abForceDisplayIfEnabled 						; Contextual
@@ -111,10 +113,13 @@ function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
 		if MainSecondaryColor
 			secondary_color = MainSecondaryColor.GetValueInt()
 		endif
-		if meter_inversion_value < 0.0
-			meter_inversion_value = 0.0
+		float bonus_range
+		if meter_inversion_value == -1.0
+			bonus_range = 0.0
+		else
+			bonus_range = meter_inversion_value
 		endif
-		Meter.SetPercent((attribute_value - meter_inversion_value) / AttributeMax.GetValue())
+		Meter.SetPercent((attribute_value - bonus_range) / AttributeMax.GetValue())
 		SetMeterColors(primary_color, secondary_color)
 	endif
 
@@ -147,9 +152,11 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 	
 	if current_zone == -1
 		; Abort and return an error. This shouldn't happen.
-		debug.trace("ERROR: CommonMeterInterfaceHandler couldn't determine the current attribute value zone. (Value: " + attribute_value + ")")
+		debug.trace("[WearableLanterns] ERROR: CommonMeterInterfaceHandler couldn't determine the current attribute value zone. (Value: " + attribute_value + ")")
 		return
 	endif
+
+	debug.trace("[WearableLanterns] current_zone " + current_zone)
 
 	float threshold_value = contextual_display_thresholds[current_zone]
 	bool should_flash = threshold_should_flash[current_zone]
