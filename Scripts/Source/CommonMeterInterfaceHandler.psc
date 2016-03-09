@@ -142,8 +142,8 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 		if i - 1 >= 0
 			next_threshold_value = contextual_display_thresholds[i - 1]
 		endif
-		if attribute_value < threshold_value && attribute_value >= next_threshold_value
-			current_zone = i - 1
+		if attribute_value <= threshold_value && (attribute_value > next_threshold_value || (attribute_value == 0.0 && next_threshold_value == 0.0))
+			current_zone = i
 			i = 0
 		else
 			i -= 1
@@ -165,28 +165,36 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 		if increasing && last_attribute_value < threshold_value && attribute_value >= threshold_value
 			if should_stay_on
 				MeterFadeUp(-1, should_flash)
+				debug.trace("a")
 			else
 				MeterFadeUp(DisplayTime.GetValueInt(), should_flash)
+				debug.trace("b")
 			endif
 		elseif !increasing && (last_attribute_value - attribute_value >= Math.Abs(improvement_display_delta_threshold))
 			MeterFadeUp(-1)
+			debug.trace("h")
 		elseif !increasing && !should_stay_on
 			if display_iterations_remaining == -1
 				display_iterations_remaining = DisplayTime.GetValueInt()
+				debug.trace("c")
 			endif
 		endif
 	else
 		if !increasing && last_attribute_value > threshold_value && attribute_value <= threshold_value
 			if should_stay_on
 				MeterFadeUp(-1, should_flash)
+				debug.trace("d")
 			else
 				MeterFadeUp(DisplayTime.GetValueInt(), should_flash)
+				debug.trace("e")
 			endif
-		elseif increasing && (last_attribute_value - attribute_value >= Math.Abs(improvement_display_delta_threshold))
+		elseif increasing && (attribute_value - last_attribute_value >= Math.Abs(improvement_display_delta_threshold))
 			MeterFadeUp(-1)
+			debug.trace("f")
 		elseif increasing && !should_stay_on
 			if display_iterations_remaining == -1
 				display_iterations_remaining = DisplayTime.GetValueInt()
+				debug.trace("g")
 			endif
 		endif
 	endif
