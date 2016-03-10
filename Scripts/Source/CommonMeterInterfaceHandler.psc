@@ -136,7 +136,7 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 
 	int i = contextual_display_thresholds.Length - 1
 	int current_zone = -1
-	while i > 0
+	while i >= 0
 		float threshold_value = contextual_display_thresholds[i]
 		float next_threshold_value = 0.0
 		if i - 1 >= 0
@@ -173,7 +173,7 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 		elseif !increasing && (last_attribute_value - attribute_value >= Math.Abs(improvement_display_delta_threshold))
 			MeterFadeUp(-1)
 			debug.trace("h")
-		elseif !increasing && !should_stay_on
+		elseif !should_stay_on
 			if display_iterations_remaining == -1
 				display_iterations_remaining = DisplayTime.GetValueInt()
 				debug.trace("c")
@@ -191,7 +191,7 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 		elseif increasing && (attribute_value - last_attribute_value >= Math.Abs(improvement_display_delta_threshold))
 			MeterFadeUp(-1)
 			debug.trace("f")
-		elseif increasing && !should_stay_on
+		elseif !should_stay_on
 			if display_iterations_remaining == -1
 				display_iterations_remaining = DisplayTime.GetValueInt()
 				debug.trace("g")
@@ -210,6 +210,7 @@ function MeterFadeUp(int iterations_remaining, bool flash = false)
 		Meter.StartFlash()
 	endIf
 	display_iterations_remaining = iterations_remaining
+	RegisterForSingleUpdate(2)
 endFunction
 
 function SetMeterColors(int aiPrimaryColor, int aiSecondaryColor)
