@@ -63,8 +63,10 @@ function UpdateMeter(bool abForceDisplayIfEnabled = false)
 		if DisplayMode.GetValueInt() == 2 && meter_displayed
 			Meter.FadeTo(0.0, 3.0)
 			meter_displayed = false
+			debug.trace("Meter no longer displayed.")
 		endif
 	endif
+	debug.trace("DisplayMode " + DisplayMode.GetValueInt() + " abForceDisplayIfEnabled " + abForceDisplayIfEnabled + " display_iterations_remaining " + display_iterations_remaining)
 endFunction
 
 function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
@@ -79,7 +81,7 @@ function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
 		endif
 	endif
 
-	debug.trace("DisplayMode " + DisplayMode.GetValueInt() + " abForceDisplayIfEnabled " + abForceDisplayIfEnabled + " display_iterations_remaining " + display_iterations_remaining + " inverted + " + inverted)
+	debug.trace("inverted " + inverted)
 
 	if DisplayMode.GetValueInt() == 1 														; Always On
 		Meter.Alpha = OpacityMax.GetValue()
@@ -129,6 +131,7 @@ endFunction
 function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled = false)
 	if abForceDisplayIfEnabled
 		display_iterations_remaining = DisplayTime.GetValueInt()
+		debug.trace("abForceDisplayIfEnabled, returning early from ContextualDisplay.")
 		return
 	endif
 
@@ -144,10 +147,11 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 		endif
 		if attribute_value <= threshold_value && (attribute_value > next_threshold_value || (attribute_value == 0.0 && next_threshold_value == 0.0))
 			current_zone = i
-			i = 0
+			i = -1
 		else
 			i -= 1
 		endif
+		debug.trace("Determining zone ID. i = " + i)
 	endWhile
 	
 	if current_zone == -1
