@@ -32,6 +32,7 @@ bool meter_displayed = false
 int display_iterations_remaining = 0
 float last_attribute_value = 0.0
 
+; Set in Creation Kit
 float[] property contextual_display_thresholds auto
 bool[] property threshold_should_flash auto
 bool[] property threshold_should_stay_on auto
@@ -156,7 +157,7 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 	
 	if current_zone == -1
 		; Abort and return an error. This shouldn't happen.
-		debug.trace("[WearableLanterns] ERROR: CommonMeterInterfaceHandler couldn't determine the current attribute value zone. (Value: " + attribute_value + ")")
+		debug.trace("[CommonMeterInterfaceHandler] ERROR: Couldn't determine the current attribute value zone. (Value: " + attribute_value + "). This is bad and you should let the author know.")
 		return
 	endif
 
