@@ -1,6 +1,6 @@
 Scriptname CommonMeterInterfaceHandler extends Quest
 
-_WL_SKI_MeterWidget property Meter auto
+Common_SKI_MeterWidget property Meter auto
 GlobalVariable property DisplayMode auto
 {The display mode global. 0 = Off. 1 = Always On. 2 = Contextual.}
 GlobalVariable property DisplayTime auto
