@@ -2,6 +2,8 @@ Scriptname CommonMeterInterfaceHandler extends Quest
 
 Common_SKI_MeterWidget property Meter auto
 Actor property PlayerRef auto
+GlobalVariable property DebugGlobal auto
+{The debug global. 0 = Debug, 1 = Info, 2 = Warning, 3 = Error.}
 GlobalVariable property DisplayMode auto
 {The display mode global. 0 = Off. 1 = Always On. 2 = Contextual.}
 GlobalVariable property DisplayTime auto
@@ -57,9 +59,11 @@ endEvent
 
 function UpdateMeter(bool abForceDisplayIfEnabled = false)
 	if RequiredWornFormList && !PlayerRef.IsEquipped(RequiredWornFormList)
+		MeterDebug(0, "UpdateMeter failed RequiredWornFormList check.")
 		return
 	endif
 	if RequiredSettingGlobal && RequiredSettingGlobal.GetValue() != 2.0
+		MeterDebug(0, "UpdateMeter failed RequiredSettingGlobal check.")
 		return
 	endif
 
@@ -76,10 +80,9 @@ function UpdateMeter(bool abForceDisplayIfEnabled = false)
 		if DisplayMode.GetValueInt() == 2 && meter_displayed
 			Meter.FadeTo(0.0, 3.0)
 			meter_displayed = false
-			; debug.trace("Meter no longer displayed.")
 		endif
 	endif
-	; debug.trace("DisplayMode " + DisplayMode.GetValueInt() + " abForceDisplayIfEnabled " + abForceDisplayIfEnabled + " display_iterations_remaining " + display_iterations_remaining)
+	MeterDebug(0, "DisplayMode " + DisplayMode.GetValueInt() + " abForceDisplayIfEnabled " + abForceDisplayIfEnabled + " display_iterations_remaining " + display_iterations_remaining)
 endFunction
 
 function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
@@ -93,8 +96,6 @@ function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
 			inverted = true
 		endif
 	endif
-
-	; debug.trace("inverted " + inverted)
 
 	if DisplayMode.GetValueInt() == 1 														; Always On
 		Meter.Alpha = Opacity.GetValue()
@@ -118,11 +119,10 @@ function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
 		endif
 		if lower_is_better
 			Meter.SetPercent(1.0 - (attribute_value / meter_inversion_value))
-			SetMeterColors(primary_color, secondary_color)
 		else
 			Meter.SetPercent(1.0 - ((attribute_value - meter_inversion_value) / (AttributeMax.GetValue() - meter_inversion_value)))
-			SetMeterColors(primary_color, secondary_color)
 		endif
+		SetMeterColors(primary_color, secondary_color)
 	else
 		primary_color = MainPrimaryColor.GetValueInt()
 		if MainSecondaryColor
@@ -138,7 +138,6 @@ function HandleMeterUpdate(bool abForceDisplayIfEnabled = false)
 				Meter.SetPercent(attribute_value / meter_inversion_value)
 			endif
 		endif
-		
 		SetMeterColors(primary_color, secondary_color)
 	endif
 
@@ -148,7 +147,7 @@ endFunction
 function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled = false)
 	if abForceDisplayIfEnabled
 		display_iterations_remaining = DisplayTime.GetValueInt()
-		; debug.trace("abForceDisplayIfEnabled, returning early from ContextualDisplay.")
+		MeterDebug(0, "abForceDisplayIfEnabled, returning early from ContextualDisplay.")
 		return
 	endif
 
@@ -168,16 +167,15 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 		else
 			i -= 1
 		endif
-		; debug.trace("Determining zone ID. i = " + i)
 	endWhile
 	
 	if current_zone == -1
 		; Abort and return an error. This shouldn't happen.
-		debug.trace("[CommonMeterInterfaceHandler] ERROR: Couldn't determine the current attribute value zone. (Value: " + attribute_value + "). This is bad and you should let the author know.")
+		MeterDebug(3, "Couldn't determine the current attribute value zone. (Value: " + attribute_value + "). This is bad and you should let the author know.")
 		return
 	endif
 
-	; debug.trace("[WearableLanterns] current_zone " + current_zone)
+	MeterDebug(0, "current_zone " + current_zone)
 
 	float threshold_value = contextual_display_thresholds[current_zone]
 	bool should_flash = threshold_should_flash[current_zone]
@@ -186,36 +184,36 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 		if increasing && last_attribute_value < threshold_value && attribute_value >= threshold_value
 			if should_stay_on
 				MeterFadeUp(-1, should_flash)
-				; debug.trace("a")
+				MeterDebug(0, "Contextual Display - Case A")
 			else
 				MeterFadeUp(DisplayTime.GetValueInt(), should_flash)
-				; debug.trace("b")
+				MeterDebug(0, "Contextual Display - Case B")
 			endif
 		elseif !increasing && (last_attribute_value - attribute_value >= Math.Abs(improvement_display_delta_threshold))
 			MeterFadeUp(-1)
-			; debug.trace("h")
+			MeterDebug(0, "Contextual Display - Case H")
 		elseif !should_stay_on
 			if display_iterations_remaining == -1
 				display_iterations_remaining = DisplayTime.GetValueInt()
-				; debug.trace("c")
+				MeterDebug(0, "Contextual Display - Case C")
 			endif
 		endif
 	else
 		if !increasing && last_attribute_value > threshold_value && attribute_value <= threshold_value
 			if should_stay_on
 				MeterFadeUp(-1, should_flash)
-				; debug.trace("d")
+				MeterDebug(0, "Contextual Display - Case D")
 			else
 				MeterFadeUp(DisplayTime.GetValueInt(), should_flash)
-				; debug.trace("e")
+				MeterDebug(0, "Contextual Display - Case E")
 			endif
 		elseif increasing && (attribute_value - last_attribute_value >= Math.Abs(improvement_display_delta_threshold))
 			MeterFadeUp(-1)
-			; debug.trace("f")
+			MeterDebug(0, "Contextual Display - Case F")
 		elseif !should_stay_on
 			if display_iterations_remaining == -1
 				display_iterations_remaining = DisplayTime.GetValueInt()
-				; debug.trace("g")
+				MeterDebug(0, "Contextual Display - Case G")
 			endif
 		endif
 	endif
@@ -237,15 +235,21 @@ endFunction
 
 function SetMeterColors(int aiPrimaryColor, int aiSecondaryColor)
 	if Meter.PrimaryColor != aiPrimaryColor
-		Meter.SetColors(aiPrimaryColor, aiSecondaryColor)
+		if aiSecondaryColor == -1
+			Meter.SetColors(aiPrimaryColor, ColorComponent.SetValue(aiPrimaryColor, 0.85))
+		else
+			Meter.SetColors(aiPrimaryColor, aiSecondaryColor)
+		endif
 	endIf
 endFunction
 
 Event ForceMeterDisplay(bool flash = false)
 	if RequiredWornFormList && !PlayerRef.IsEquipped(RequiredWornFormList)
+		MeterDebug(0, "ForceMeterDisplay failed RequiredWornFormList check.")
 		return
 	endif
 	if RequiredSettingGlobal && RequiredSettingGlobal.GetValue() != 2.0
+		MeterDebug(0, "ForceMeterDisplay failed RequiredSettingGlobal check.")
 		return
 	endif
 	MeterFadeUp(DisplayTime.GetValueInt(), flash)
@@ -258,9 +262,26 @@ endEvent
 
 Event CheckMeterRequirements()
 	if RequiredWornFormList && !PlayerRef.IsEquipped(RequiredWornFormList)
+		MeterDebug(0, "CheckMeterRequirements failed RequiredWornFormList check.")
 		RemoveMeter()
 	endif
 	if RequiredSettingGlobal && RequiredSettingGlobal.GetValue() != 2.0
+		MeterDebug(0, "CheckMeterRequirements failed RequiredSettingGlobal check.")
 		RemoveMeter()
 	endif
 endEvent
+
+function MeterDebug(int aiSeverity, string asLogMessage)
+	int LOG_LEVEL = DebugGlobal.GetValueInt()
+	if LOG_LEVEL <= aiSeverity
+		if aiSeverity == 0
+			debug.trace("[" + self + "][Debug] " + asLogMessage)
+		elseif aiSeverity == 1
+			debug.trace("[" + self + "][Info] " + asLogMessage)
+		elseif aiSeverity == 2
+			debug.trace("[" + self + "][Warning] " + asLogMessage)
+		elseif aiSeverity == 3
+			debug.trace("[" + self + "][ERROR] " + asLogMessage)
+		endif
+	endif
+endFunction
