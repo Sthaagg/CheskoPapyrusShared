@@ -52,6 +52,16 @@ bool function ArrayAddActivator(Activator[] akArray, Activator akValue) global
 	return false
 endFunction
 
+bool function ArrayAddRef(ObjectReference[] akArray, ObjectReference akValue) global
+    int index = akArray.Find(None)
+    if index >= 0
+        akArray[index] = akValue
+        return true
+    else
+    	return false
+    endif
+endFunction
+
 bool function ArrayAddBool(Bool[] abArray, Bool abValue, int aiIndex) global
 	;Adds a bool to the given array index.
 	;		false		=		Error (array full)
@@ -99,6 +109,28 @@ bool function ArrayAddFloat(float[] afArray, float afValue, float afInsertAtValu
 	return false
 endFunction
 
+bool function ArrayRemoveArmor(Armor[] akArray, Armor akValue, bool abSort = false) global
+    ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
+    ;       false       =       Error (string not found)
+    ;       true        =       Success
+
+    int i = 0
+    while i < akArray.Length
+        if akArray[i] == akValue
+            akArray[i] = None
+            if abSort == true
+                ArraySortArmor(akArray)
+            endif
+            return true
+        else
+            i += 1
+        endif
+    endWhile    
+
+    return false
+    
+endFunction
+
 bool function ArraySortForm(Form[] akArray, int i = 0) global
 	;Removes blank elements by shifting all elements down.
 	;		   false		=			   No sorting required
@@ -125,6 +157,44 @@ bool function ArraySortForm(Form[] akArray, int i = 0) global
  
 						 ;Call this function recursively until it returns
 						 ArraySortForm(akArray, iFirstNonePos + 1)
+						 return true
+					else
+						 i += 1
+					endif
+			   else
+					i += 1
+			   endif
+		  endif
+	 endWhile
+	 return false
+endFunction
+
+bool function ArraySortArmor(Armor[] akArray, int i = 0) global
+	;Removes blank elements by shifting all elements down.
+	;		   false		=			   No sorting required
+	;		   true			=			   Success
+ 
+	 bool bFirstNoneFound = false
+	 int iFirstNonePos = i
+	 while i < akArray.Length
+		  if IsNone(akArray[i])
+		  	   akArray[i] = none
+			   if bFirstNoneFound == false
+					bFirstNoneFound = true
+					iFirstNonePos = i
+					i += 1
+			   else
+					i += 1
+			   endif
+		  else
+			   if bFirstNoneFound == true
+			   ;check to see if it's a couple of blank entries in a row
+					if !(IsNone(akArray[i]))
+						 akArray[iFirstNonePos] = akArray[i]
+						 akArray[i] = none
+ 
+						 ;Call this function recursively until it returns
+						 ArraySortArmor(akArray, iFirstNonePos + 1)
 						 return true
 					else
 						 i += 1
@@ -230,7 +300,7 @@ endFunction
 bool function IsNone(Form akForm) global
 	; Array elements that contain forms from unloaded mods
 	; will fail '== None' checks because they are
-	; 'Activator<None>' objects. Check FormID as well.
+	; 'Form<None>' objects. Check FormID as well.
 	int i = 0
 	if akForm
 		i = akForm.GetFormID()
