@@ -177,11 +177,16 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 
 	MeterDebug(0, "current_zone " + current_zone)
 
-	float threshold_value = contextual_display_thresholds[current_zone]
+	float upper_bound = contextual_display_thresholds[current_zone]
+	float lower_bound = 0.0
+	if current_zone > 0
+		lower_bound = contextual_display_thresholds[current_zone - 1]
+	endif
 	bool should_flash = threshold_should_flash[current_zone]
 	bool should_stay_on = threshold_should_stay_on[current_zone]
+	; MeterDebug(0, "AV " + attribute_value + " last AV " + last_attribute_value + " upper_bound " + upper_bound + " lower_bound " + lower_bound + " should_flash " + should_flash + " should stay on " + should_stay_on)
 	if lower_is_better
-		if increasing && last_attribute_value < threshold_value && attribute_value >= threshold_value
+		if increasing && last_attribute_value <= lower_bound && attribute_value > lower_bound
 			if should_stay_on
 				MeterFadeUp(-1, should_flash)
 				MeterDebug(0, "Contextual Display - Case A")
@@ -199,7 +204,7 @@ function ContextualDisplay(float attribute_value, bool abForceDisplayIfEnabled =
 			endif
 		endif
 	else
-		if !increasing && last_attribute_value > threshold_value && attribute_value <= threshold_value
+		if !increasing && last_attribute_value > upper_bound && attribute_value <= upper_bound
 			if should_stay_on
 				MeterFadeUp(-1, should_flash)
 				MeterDebug(0, "Contextual Display - Case D")
