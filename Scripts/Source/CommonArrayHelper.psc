@@ -1,6 +1,10 @@
 scriptname CommonArrayHelper hidden
 {Global array helper functions.}
 
+int function GetVersion() global
+	return 2
+endFunction
+
 bool function ArrayAddForm(Form[] akArray, Form akValue) global
 	;Adds a form to the first available non-None element in the array.
 	;		false		=		Error (array full)
@@ -9,6 +13,40 @@ bool function ArrayAddForm(Form[] akArray, Form akValue) global
 	int i = 0
 	while i < akArray.Length
 		if IsNone(akArray[i])
+			akArray[i] = akValue
+			return true
+		else
+			i += 1
+		endif
+	endWhile
+	return false
+endFunction
+
+bool function ArrayAddAlias(Alias[] akArray, Alias akValue) global
+	;Adds a form to the first available non-None element in the array.
+	;		false		=		Error (array full)
+	;		true		=		Success
+
+	int i = 0
+	while i < akArray.Length
+		if akArray[i] == None
+			akArray[i] = akValue
+			return true
+		else
+			i += 1
+		endif
+	endWhile
+	return false
+endFunction
+
+bool function ArrayAddActiveMagicEffect(ActiveMagicEffect[] akArray, ActiveMagicEffect akValue) global
+	;Adds a form to the first available non-None element in the array.
+	;		false		=		Error (array full)
+	;		true		=		Success
+
+	int i = 0
+	while i < akArray.Length
+		if akArray[i] == None
 			akArray[i] = akValue
 			return true
 		else
@@ -109,6 +147,26 @@ bool function ArrayAddFloat(float[] afArray, float afValue, float afInsertAtValu
 	return false
 endFunction
 
+<<<<<<< HEAD
+=======
+bool function ArrayAddString(String[] asArray, String asValue) global
+	;Adds a form to the first available non-None element in the array.
+	;		false		=		Error (array full)
+	;		true		=		Success
+
+	int i = 0
+	while i < asArray.Length
+		if asArray[i] != ""
+			asArray[i] = asValue
+			return true
+		else
+			i += 1
+		endif
+	endWhile
+	return false
+endFunction
+
+>>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 bool function ArrayRemoveForm(Form[] akArray, Form akValue, bool abSort = false) global
     ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
     ;       false       =       Error (string not found)
@@ -125,6 +183,7 @@ bool function ArrayRemoveForm(Form[] akArray, Form akValue, bool abSort = false)
         else
             i += 1
         endif
+<<<<<<< HEAD
     endWhile    
 
     return false
@@ -176,6 +235,14 @@ bool function ArrayRemoveMessage(Message[] akArray, Message akValue, bool abSort
 endFunction
 
 
+=======
+    endWhile
+
+    return false
+
+endFunction
+
+>>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 bool function ArrayRemoveArmor(Armor[] akArray, Armor akValue, bool abSort = false) global
     ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
     ;       false       =       Error (string not found)
@@ -192,17 +259,61 @@ bool function ArrayRemoveArmor(Armor[] akArray, Armor akValue, bool abSort = fal
         else
             i += 1
         endif
-    endWhile    
+    endWhile
 
     return false
-    
+
+endFunction
+
+bool function ArrayRemoveMessage(Message[] akArray, Message akValue, bool abSort = false) global
+    ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
+    ;       false       =       Error (string not found)
+    ;       true        =       Success
+
+    int i = 0
+    while i < akArray.Length
+        if akArray[i] == akValue
+            akArray[i] = None
+            if abSort == true
+                ArraySortMessage(akArray)
+            endif
+            return true
+        else
+            i += 1
+        endif
+    endWhile
+
+    return false
+
+endFunction
+
+bool function ArrayRemoveFormList(FormList[] akArray, FormList akValue, bool abSort = false) global
+    ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
+    ;       false       =       Error (string not found)
+    ;       true        =       Success
+
+    int i = 0
+    while i < akArray.Length
+        if akArray[i] == akValue
+            akArray[i] = None
+            if abSort == true
+                ArraySortFormList(akArray)
+            endif
+            return true
+        else
+            i += 1
+        endif
+    endWhile
+
+    return false
+
 endFunction
 
 bool function ArraySortForm(Form[] akArray, int i = 0) global
 	;Removes blank elements by shifting all elements down.
 	;		   false		=			   No sorting required
 	;		   true			=			   Success
- 
+
 	 bool bFirstNoneFound = false
 	 int iFirstNonePos = i
 	 while i < akArray.Length
@@ -221,7 +332,7 @@ bool function ArraySortForm(Form[] akArray, int i = 0) global
 					if !(IsNone(akArray[i]))
 						 akArray[iFirstNonePos] = akArray[i]
 						 akArray[i] = none
- 
+
 						 ;Call this function recursively until it returns
 						 ArraySortForm(akArray, iFirstNonePos + 1)
 						 return true
@@ -240,7 +351,7 @@ bool function ArraySortArmor(Armor[] akArray, int i = 0) global
 	;Removes blank elements by shifting all elements down.
 	;		   false		=			   No sorting required
 	;		   true			=			   Success
- 
+
 	 bool bFirstNoneFound = false
 	 int iFirstNonePos = i
 	 while i < akArray.Length
@@ -259,7 +370,7 @@ bool function ArraySortArmor(Armor[] akArray, int i = 0) global
 					if !(IsNone(akArray[i]))
 						 akArray[iFirstNonePos] = akArray[i]
 						 akArray[i] = none
- 
+
 						 ;Call this function recursively until it returns
 						 ArraySortArmor(akArray, iFirstNonePos + 1)
 						 return true
@@ -278,7 +389,7 @@ bool function ArraySortActivator(Activator[] akArray, int i = 0) global
 	;Removes blank elements by shifting all elements down.
 	;		   false		=			   No sorting required
 	;		   true			=			   Success
- 
+
 	 bool bFirstNoneFound = false
 	 int iFirstNonePos = i
 	 while i < akArray.Length
@@ -297,7 +408,7 @@ bool function ArraySortActivator(Activator[] akArray, int i = 0) global
 					if !(IsNone(akArray[i]))
 						 akArray[iFirstNonePos] = akArray[i]
 						 akArray[i] = none
- 
+
 						 ;Call this function recursively until it returns
 						 ArraySortActivator(akArray, iFirstNonePos + 1)
 						 return true
@@ -316,7 +427,11 @@ bool function ArraySortMessage(Message[] akArray, int i = 0) global
 	;Removes blank elements by shifting all elements down.
 	;		   false		=			   No sorting required
 	;		   true			=			   Success
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 	 bool bFirstNoneFound = false
 	 int iFirstNonePos = i
 	 while i < akArray.Length
@@ -335,7 +450,11 @@ bool function ArraySortMessage(Message[] akArray, int i = 0) global
 					if !(IsNone(akArray[i]))
 						 akArray[iFirstNonePos] = akArray[i]
 						 akArray[i] = none
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 						 ;Call this function recursively until it returns
 						 ArraySortMessage(akArray, iFirstNonePos + 1)
 						 return true
@@ -354,7 +473,11 @@ bool function ArraySortFormList(FormList[] akArray, int i = 0) global
 	;Removes blank elements by shifting all elements down.
 	;		   false		=			   No sorting required
 	;		   true			=			   Success
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 	 bool bFirstNoneFound = false
 	 int iFirstNonePos = i
 	 while i < akArray.Length
@@ -373,7 +496,11 @@ bool function ArraySortFormList(FormList[] akArray, int i = 0) global
 					if !(IsNone(akArray[i]))
 						 akArray[iFirstNonePos] = akArray[i]
 						 akArray[i] = none
+<<<<<<< HEAD
  
+=======
+
+>>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 						 ;Call this function recursively until it returns
 						 ArraySortFormList(akArray, iFirstNonePos + 1)
 						 return true
@@ -391,7 +518,7 @@ endFunction
 int function ArrayCountForm(Form[] akArray) global
 	;Counts the number of indices in this array that do not have a "none" type.
 	;		int myCount = number of indicies that are not "none"
- 
+
 	int i = 0
 	int myCount = 0
 	while i < akArray.Length
@@ -405,10 +532,44 @@ int function ArrayCountForm(Form[] akArray) global
 	return myCount
 endFunction
 
+int function ArrayCountAlias(Alias[] akArray) global
+	;Counts the number of indices in this array that do not have a "none" type.
+	;		int myCount = number of indicies that are not "none"
+
+	int i = 0
+	int myCount = 0
+	while i < akArray.Length
+		if akArray[i] != None
+			myCount += 1
+			i += 1
+		else
+			i += 1
+		endif
+	endWhile
+	return myCount
+endFunction
+
+int function ArrayCountActiveMagicEffect(ActiveMagicEffect[] akArray) global
+	;Counts the number of indices in this array that do not have a "none" type.
+	;		int myCount = number of indicies that are not "none"
+
+	int i = 0
+	int myCount = 0
+	while i < akArray.Length
+		if akArray[i] != None
+			myCount += 1
+			i += 1
+		else
+			i += 1
+		endif
+	endWhile
+	return myCount
+endFunction
+
 int function ArrayCountArmor(Armor[] akArray) global
 	;Counts the number of indices in this array that do not have a "none" type.
 	;		int myCount = number of indicies that are not "none"
- 
+
 	int i = 0
 	int myCount = 0
 	while i < akArray.Length
@@ -425,11 +586,28 @@ endFunction
 int function ArrayCountActivator(Activator[] akArray) global
 	;Counts the number of indices in this array that do not have a "none" type.
 	;		int myCount = number of indicies that are not "none"
- 
+
 	int i = 0
 	int myCount = 0
 	while i < akArray.Length
 		if !(IsNone(akArray[i]))
+			myCount += 1
+			i += 1
+		else
+			i += 1
+		endif
+	endWhile
+	return myCount
+endFunction
+
+int function ArrayCountRef(ObjectReference[] akArray) global
+	;Counts the number of indices in this array that do not have a "none" type.
+	;		int myCount = number of indicies that are not "none"
+
+	int i = 0
+	int myCount = 0
+	while i < akArray.Length
+		if akArray[i] != None
 			myCount += 1
 			i += 1
 		else
