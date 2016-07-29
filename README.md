@@ -41,8 +41,8 @@ use `ModEvent`.
 
 To register for the custom event, we must reference the Quest that serves
 as our emitter. Unlike Mod Events, we must call the right function depending
-on the type of the registrar. You can register Forms, Aliases, and
-ActiveMagicEffects. If your object is not one of these types, see if it can
+on the type of the registrar. You can register **Forms**, **Aliases**, and
+**ActiveMagicEffects**. If your object is not one of these types, see if it can
 be cast to it. For instance, ReferenceAliases can be cast to Alias.
 
 As an example, we will register a wagon to myCoolEvent. You'll notice that
