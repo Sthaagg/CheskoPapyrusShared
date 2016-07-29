@@ -1,9 +1,15 @@
-scriptname FallbackEventSender extends Quest
+scriptname FallbackEventEmitter extends Quest
+{Allows registration and emitting of mod event using SKSE or in SKSE-less fallback mode.}
 
 import CommonArrayHelper
 
 Activator property FallbackEventHandleMarker auto
-int property SKSE_MIN_VERSION = 10700 autoReadOnly ; Version ModEvent introduced
+{Link to your event handler marker object. See the CheskoPapyrusShared readme for more info.}
+
+bool property UseSKSEModEvents = true auto
+{If false, events from this emitter will only be registered / sent via Fallback Events.}
+
+int property SKSE_MIN_VERSION = 10700 auto hidden ; Version that ModEvent was introduced
 
 Form[] registeredForms
 Alias[] registeredAliases
