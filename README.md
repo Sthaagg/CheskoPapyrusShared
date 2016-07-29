@@ -7,7 +7,8 @@ arrays easier. It is non-exhaustive and primarily contains on the types I've
 needed in my own projects. Feel free to fork this project or modify the
 code to add your own functions if the one that you need isn't available.
 
-All of the functions are global, so to use this library in your project,
+All of the functions are global, so to use this library in your project, just
+`import CommonArrayHelper`.
 
 ##Fallback Events
 ***Warning: Fallback Events are NOT READY for public consumption. This readme
