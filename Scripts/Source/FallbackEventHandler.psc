@@ -59,45 +59,42 @@ bool function Send(Form[] afRegisteredForms, Alias[] afRegisteredAliases, Active
   receiverForms = afRegisteredForms
   receiverAliases = afRegisteredAliases
   receiverEffects = afRegisteredActiveMagicEffects
-  GoToState("Sending")
+  RegisterForSingleUpdate(0.01)
   debug.trace(" <<<< Returning from Fallback Event Send.")
   return true
 endFunction
 
-state Sending
-  Event OnBeginState()
-    debug.trace(" |||| Starting Send.")
+Event OnUpdate()
+  debug.trace(" |||| Starting Send.")
 
-    int i = 0
-    int registered_form_count = ArrayCountForm(receiverForms)
-    while i < registered_form_count
-      debug.trace("calling event on " + receiverForms[i] as FallbackEventReceiverForm)
-      (receiverForms[i] as FallbackEventReceiverForm).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
-      i += 1
-    endWhile
+  int i = 0
+  int registered_form_count = ArrayCountForm(receiverForms)
+  debug.trace("Registered fallback event forms: " + receiverForms)
+  while i < registered_form_count
+    debug.trace("calling event on " + receiverForms[i] as FallbackEventReceiverForm)
+    (receiverForms[i] as FallbackEventReceiverForm).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
+    i += 1
+  endWhile
 
-    Utility.Wait(5)
+  i = 0
+  int registered_alias_count = ArrayCountAlias(receiverAliases)
+  while i < registered_alias_count
+    (receiverAliases[i] as FallbackEventReceiverAlias).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
+    i += 1
+  endWhile
 
-    i = 0
-    int registered_alias_count = ArrayCountAlias(receiverAliases)
-    while i < registered_alias_count
-      (receiverAliases[i] as FallbackEventReceiverAlias).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
-      i += 1
-    endWhile
+  i = 0
+  int registered_effect_count = ArrayCountActiveMagicEffect(receiverEffects)
+  while i < registered_effect_count
+    (receiverEffects[i] as FallbackEventReceiverActiveMagicEffect).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
+    i += 1
+  endWhile
 
-    i = 0
-    int registered_effect_count = ArrayCountActiveMagicEffect(receiverEffects)
-    while i < registered_effect_count
-      (receiverEffects[i] as FallbackEventReceiverActiveMagicEffect).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
-      i += 1
-    endWhile
+  sender.Release(self)
+  Dispose()
 
-    sender.Release(self)
-    Dispose()
-
-    debug.trace(" |||| Ending Send.")
-  EndEvent
-endState
+  debug.trace(" |||| Ending Send.")
+EndEvent
 
 function Dispose()
   pushedBools = new Bool[32]
