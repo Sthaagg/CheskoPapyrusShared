@@ -4,6 +4,7 @@ import CommonArrayHelper
 
 FallbackEventEmitter property sender auto hidden
 string property eventName auto hidden
+int property handleID auto hidden
 Form[] receiverForms
 Alias[] receiverAliases
 ActiveMagicEffect[] receiverEffects
@@ -109,7 +110,7 @@ Event OnUpdate()
     i += 1
   endWhile
 
-  sender.Release(self)
+  sender.Release(handleID)
   Dispose()
 EndEvent
 
