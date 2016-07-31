@@ -223,6 +223,10 @@ function PushForm(int handle, form value)
 endFunction
 
 bool function IsSKSELoaded()
+  if !UseSKSEModEvents
+    return false
+  endif
+
 	bool skse_loaded = SKSE.GetVersion()
   if skse_loaded
 		int skse_version = (SKSE.GetVersion() * 10000) + (SKSE.GetVersionMinor() * 100) + SKSE.GetVersionBeta()

@@ -20,8 +20,8 @@ system. If SKSE isn't available, it will "fall back" to using a vanilla-only
 custom event implementation. You can also bypass the default behavior and elect
 to only use the Fallback Event system ([see note](https://github.com/chesko256/CheskoPapyrusShared#note-disabling-skse-mod-events)).
 
-This library is handy for creating or retrofitting mods that rely on Mod Events
-to work on console platforms, or on PCs that do not have SKSE installed, while
+This library is handy for **creating or retrofitting mods that rely on Mod Events
+to work on console platforms**, or on PCs that do not have SKSE installed, while
 preserving most important functionality.
 
 Fallback Events use an SKSE Mod Event-like syntax and retains many of the
@@ -30,6 +30,16 @@ them to use the Fallback Event library should not take a large amount of effort.
 
 Fallback Events require some additional objects in the Creation Kit in order to
 set them up, as well as some additional code. These steps are detailed below.
+
+### Example Implementation
+Frostfall has already successfully implemented Fallback Events in some of its
+code as it begins aligning itself towards becoming console-compatible. You can
+see an example by looking at [_Frost_ClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_ClimateSystem.psc),
+which registers for an event `OnTamrielRegionChange`, and [_Frost_RegionDetectScript](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_RegionDetectScript.psc),
+which pushes some data and sends the event. [_Frost_FallbackReceiverClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_FallbackReceiverClimateSystem.psc) receives the event and
+calls the appropriate event method. `GetEventEmitter_OnTamrielRegionChange()`
+is an abstraction to get the Event Emitter implemented on [FrostUtil](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/FrostUtil.psc) and is strictly
+for my own convenience.
 
 ###Getting Started
 Start by downloading and adding the following files from this repository into
@@ -198,15 +208,6 @@ or via code (BEFORE the event is registered to or an event handle is
 `Create()`ed!). Doing it in the CK is the safest. This will prevent the library
 from trying to use an SKSE Mod Event, even if the user has SKSE installed.
 
-###Note: Example Implementation
-Frostfall has already successfully implemented Fallback Events in some of its
-code as it begins aligning itself towards becoming console-compatible. You can
-see an example by looking at [_Frost_ClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_ClimateSystem.psc),
-which registers for an event `OnTamrielRegionChange`, and [_Frost_RegionDetectScript](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_RegionDetectScript.psc),
-which pushes some data and sends the event. [_Frost_FallbackReceiverClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_FallbackReceiverClimateSystem.psc) receives the event and
-calls the appropriate event method. `GetEventEmitter_OnTamrielRegionChange()`
-is an abstraction to get the Event Emitter implemented on [FrostUtil](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/FrostUtil.psc) and is strictly
-for my own convenience.
 
 ###Pros
 
@@ -231,7 +232,8 @@ event block on each receiver if each receiver takes a long time to execute. This
 makes fallback events somewhat unsuitable for long-running event code or events
 with many receivers. Try to return quickly from your custom events in order to
 speed up execution time.
-* There is more to set up; it isn't a purely code-based solution.
+* There is more to set up; it isn't a purely code-based solution. (It is,
+  however, a heck of a lot less to set up than doing it yourself without SKSE.)
 * You have to write more code (manually unpacking data for the receiver, etc).
 * Unlike Mod Events, which take an arbitrary number of parameters pushed to
 the event, Fallback Events can only take 32 of each type (32 bools, 32 ints, etc).
