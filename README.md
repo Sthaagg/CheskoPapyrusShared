@@ -49,14 +49,14 @@ to each one. You can then interact with it in your code much like you would
 use `ModEvent`.
 
 To register for the custom event, we must reference the Quest that serves
-as our emitter. Unlike Mod Events, we must call the right function depending
+as our emitter. We must call the right function depending
 on the type of the registrar. You can register **Forms**, **Aliases**, and
 **ActiveMagicEffects**. If your object is not one of these types, see if it can
 be cast to it. For instance, ReferenceAliases can be cast to Alias.
 
 As an example, we will register a wagon to myCoolEvent. You'll notice that
 unlike Mod Events, we must pass a third parameter, which is the object being
-registered.
+registered. Otherwise, this should look fairly familar to SKSE Mod Event users.
 
 We'll define the custom event below as well. myCoolEvent has 3 parameters. When
 the event is sent (either by SKSE Mod Event or by Fallback Event),
@@ -94,7 +94,7 @@ object.
 Lastly, you must attach a **Fallback Event Receiver** to the object that
 registered for an event.
 
-You should not use the included `FallbackEventReceiver*` scripts, you should
+You should ***NOT*** use the included `FallbackEventReceiver*` scripts, you should
 create a new script and extend it.
 
 In this script, we must "unpack" the data received by the event ourselves
@@ -198,11 +198,12 @@ from trying to use an SKSE Mod Event, even if the user has SKSE installed.
 ###Note: Example Implementation
 Frostfall has already successfully implemented Fallback Events in some of its
 code as it begins aligning itself towards becoming console-compatible. You can
-see an example by looking at [_Frost_ClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_ClimateSystem.psc#L115),
+see an example by looking at [_Frost_ClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_ClimateSystem.psc),
 which registers for an event `OnTamrielRegionChange`, and [_Frost_RegionDetectScript](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_RegionDetectScript.psc),
-which pushes some data and sends the event. `GetEventEmitter_OnTamrielRegionChange()`
-is an abstraction to get the Event Emitter implemented on [FrostUtil](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/FrostUtil.psc#L173) strictly
-for convenience.
+which pushes some data and sends the event. [_Frost_FallbackReceiverClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_FallbackReceiverClimateSystem.psc) receives the event and
+calls the appropriate event method. `GetEventEmitter_OnTamrielRegionChange()`
+is an abstraction to get the Event Emitter implemented on [FrostUtil](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/FrostUtil.psc) and is strictly
+for my own convenience.
 
 ###Pros
 

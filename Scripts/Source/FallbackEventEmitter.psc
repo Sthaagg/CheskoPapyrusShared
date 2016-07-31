@@ -14,6 +14,8 @@ bool property UseSKSEModEvents = true auto
 
 int property SKSE_MIN_VERSION = 10700 auto hidden ; Version that ModEvent was introduced
 
+int VERSION = 1 ; Fallback Event API version
+
 Form[] registeredForms
 Alias[] registeredAliases
 ActiveMagicEffect[] registeredActiveMagicEffects
@@ -25,6 +27,10 @@ Event OnInit()
   registeredActiveMagicEffects = new ActiveMagicEffect[128]
   handles = new Form[128]
 EndEvent
+
+int function GetVersion()
+  return VERSION
+endFunction
 
 int function Create(string asEventName)
   if IsSKSELoaded()
@@ -69,6 +75,17 @@ function RegisterFormForModEventWithFallback(string asEventName, string asCallba
   endif
 endFunction
 
+function UnregisterFormForModEventWithFallback(string asEventName, Form akReceiver)
+  if IsSKSELoaded()
+    akReceiver.UnregisterForModEvent(asEventName)
+  else
+    FallbackEventReceiverForm receiver = akReceiver as FallbackEventReceiverForm
+    if receiver
+      ArrayRemoveForm(registeredForms, akReceiver, true)
+    endif
+  endif
+endFunction
+
 function RegisterAliasForModEventWithFallback(string asEventName, string asCallbackName, Alias akReceiver)
   if IsSKSELoaded()
     akReceiver.RegisterForModEvent(asEventName, asCallbackName)
@@ -84,6 +101,17 @@ function RegisterAliasForModEventWithFallback(string asEventName, string asCallb
   endif
 endFunction
 
+function UnregisterAliasForModEventWithFallback(string asEventName, Alias akReceiver)
+  if IsSKSELoaded()
+    akReceiver.UnregisterForModEvent(asEventName)
+  else
+    FallbackEventReceiverAlias receiver = akReceiver as FallbackEventReceiverAlias
+    if receiver
+      ArrayRemoveAlias(registeredAliases, akReceiver, true)
+    endif
+  endif
+endFunction
+
 function RegisterActiveMagicEffectForModEventWithFallback(string asEventName, string asCallbackname, ActiveMagicEffect akReceiver)
   if IsSKSELoaded()
     akReceiver.RegisterForModEvent(asEventName, asCallbackName)
@@ -95,6 +123,17 @@ function RegisterActiveMagicEffectForModEventWithFallback(string asEventName, st
         ArrayAddActiveMagicEffect(registeredActiveMagicEffects, akReceiver)
         ArraySortActiveMagicEffect(registeredActiveMagicEffects)
       endif
+    endif
+  endif
+endFunction
+
+function UnregisterActiveMagicEffectForModEventWithFallback(string asEventName, ActiveMagicEffect akReceiver)
+  if IsSKSELoaded()
+    akReceiver.UnregisterForModEvent(asEventName)
+  else
+    FallbackEventReceiverActiveMagicEffect receiver = akReceiver as FallbackEventReceiverActiveMagicEffect
+    if receiver
+      ArrayRemoveActiveMagicEffect(registeredActiveMagicEffects, akReceiver, true)
     endif
   endif
 endFunction
