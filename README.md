@@ -11,9 +11,6 @@ All of the functions are global, so to use this library in your project, just
 `import CommonArrayHelper`.
 
 ##Fallback Events
-***Warning: Fallback Events are NOT READY for public consumption. This readme
-is a Work-in-Progress. This warning will be removed upon release.***
-
 The **Fallback Event library** allows you to register for custom events. If SKSE
 is available on the user's system, by default, it will use the SKSE ModEvent
 system. If SKSE isn't available, it will "fall back" to using a vanilla-only
@@ -30,6 +27,18 @@ them to use the Fallback Event library should not take a large amount of effort.
 
 Fallback Events require some additional objects in the Creation Kit in order to
 set them up, as well as some additional code. These steps are detailed below.
+
+###Getting Started
+Start by downloading and adding the following files from this repository into
+your project:
+```
+CommonArrayHelper.psc / .pex
+FallbackEventEmitter.psc / .pex
+FallbackEventHandler.psc / .pex
+FallbackEventReceiverForm.psc / .pex
+FallbackEventReceiverAlias.psc / .pex
+FallbackEventReceiverActiveMagicEffect.psc / .pex
+```
 
 ###Event Emitter
 The **Fallback Event Emitter** takes care of event registration, as well as
@@ -79,6 +88,7 @@ object.
 3. Duplicate xMarkerActivator. Rename the duplicate something memorable.
 4. Attach the `FallbackEventHandler` script to the object.
 5. In all of your Fallback Event Emitter quests, open the properties of the `FallbackEventEmitter` and fill the `FallbackEventHandleMarker` property with the activator you just created.
+6. Make sure to fill the PlayerRef property of the Event Emitter while you're there, too.
 
 ###Event Receiver
 Lastly, you must attach a **Fallback Event Receiver** to the object that
@@ -178,29 +188,46 @@ This would send a custom event to anyone registered to myCoolEvent using
 an SKSE Mod Event (if the user has SKSE installed), or a Fallback Event if
 they don't.
 
-###Disabling SKSE Mod Events
+###Note: Disabling SKSE Mod Events
 If for some reason you would like to only send the event using a Fallback Event,
 set the `UseSKSEModEvents` property on the Event Emitter to `false` in the CK
 or via code (BEFORE the event is registered to or an event handle is
 `Create()`ed!). Doing it in the CK is the safest. This will prevent the library
 from trying to use an SKSE Mod Event, even if the user has SKSE installed.
 
+###Note: Example Implementation
+Frostfall has already successfully implemented Fallback Events in some of its
+code as it begins aligning itself towards becoming console-compatible. You can
+see an example by looking at [_Frost_ClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_ClimateSystem.psc#L115),
+which registers for an event `OnTamrielRegionChange`, and [_Frost_RegionDetectScript](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_RegionDetectScript.psc),
+which pushes some data and sends the event. `GetEventEmitter_OnTamrielRegionChange()`
+is an abstraction to get the Event Emitter implemented on [FrostUtil](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/FrostUtil.psc#L173) strictly
+for convenience.
+
 ###Pros
 
 * Fallback Events work even if the user doesn't have SKSE installed.
 * They will (presumably) work on consoles.
-* Using them in code feels familiar to using Mod Events.
+* Using them (sending, creating, pushing data, etc) in code feels familiar to
+using Mod Events.
+* Like Mod Events, they don't have to be unregistered for. When the registered
+object no longer exists, it will be automatically unregistered.
 
 ###Cons
 
+* The performance of a Fallback Event **will be slower (possibly much slower)**
+than a Mod Event. `Send()` returns immediately. However, once `Send()` is
+called, each registered receiver is called one by one instead of simultaneously
+by the event handler. The event handler can't call the next receiver's event
+until the one that it's currently on finishes running. For instance, if refA,
+refB, and refC are all registered to receive the myCoolEvent event,
+refA.myCoolEvent() must execute completely before refB.myCoolEvent is called.
+This means that the event handler might require significant time to call the
+event block on each receiver if each receiver takes a long time to execute. This
+makes fallback events somewhat unsuitable for long-running event code or events
+with many receivers. Try to return quickly from your custom events in order to
+speed up execution time.
 * There is more to set up; it isn't a purely code-based solution.
-* It requires a bit of leg-work and setup in the Creation Kit.
 * You have to write more code (manually unpacking data for the receiver, etc).
 * Unlike Mod Events, which take an arbitrary number of parameters pushed to
 the event, Fallback Events can only take 32 of each type (32 bools, 32 ints, etc).
-* The performance of a Fallback Event will be slower than a Mod Event. A small
-amount of time (0.01 seconds) must pass before the event is sent; and once
-`Send()` is called, each receiver is called serially instead of simultaneously.
-The system doesn't wait for the receiving event to execute completely (it
-returns immediately), but the act of calling each receiver one by one still
-introduces overhead.

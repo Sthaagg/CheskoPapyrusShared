@@ -9,6 +9,11 @@ Alias[] receiverAliases
 ActiveMagicEffect[] receiverEffects
 
 int pushedBoolCount = 0
+int pushedIntCount = 0
+int pushedFloatCount = 0
+int pushedStringCount = 0
+int pushedFormCount = 0
+int MAX_COUNT = 32
 Bool[] pushedBools
 Int[] pushedInts
 Float[] pushedFloats
@@ -24,7 +29,6 @@ Event OnInit()
   pushedStrings = new string[32]
   pushedForms = new form[32]
   initialized = true
-  debug.trace("Handler " + self + " initialized.")
 endEvent
 
 bool function IsInitialized()
@@ -37,28 +41,42 @@ endFunction
 
 function PushBool(bool value)
   WaitForInitialization()
-  ArrayAddBool(pushedBools, value, pushedBoolCount)
-  pushedBoolCount += 1
+  if pushedBoolCount < MAX_COUNT
+    pushedBools[pushedBoolCount] = value
+    pushedBoolCount += 1
+  endif
 endFunction
 
 function PushInt(int value)
   WaitForInitialization()
-  ArrayAddInt(pushedInts, value)
+  if pushedIntCount < MAX_COUNT
+    pushedInts[pushedIntCount] = value
+    pushedIntCount += 1
+  endif
 endFunction
 
 function PushFloat(float value)
   WaitForInitialization()
-  ArrayAddFloat(pushedFloats, value)
+  if pushedFloatCount < MAX_COUNT
+    pushedFloats[pushedFloatCount] = value
+    pushedFloatCount += 1
+  endif
 endFunction
 
 function PushString(string value)
   WaitForInitialization()
-  ArrayAddString(pushedStrings, value)
+  if pushedStringCount < MAX_COUNT
+    pushedStrings[pushedStringCount] = value
+    pushedStringCount += 1
+  endif
 endFunction
 
 function PushForm(form value)
   WaitForInitialization()
-  ArrayAddForm(pushedForms, value)
+  if pushedFormCount < MAX_COUNT
+    pushedForms[pushedFormCount] = value
+    pushedFormCount += 1
+  endif
 endFunction
 
 bool function Send(Form[] afRegisteredForms, Alias[] afRegisteredAliases, ActiveMagicEffect[] afRegisteredActiveMagicEffects)
@@ -66,18 +84,13 @@ bool function Send(Form[] afRegisteredForms, Alias[] afRegisteredAliases, Active
   receiverAliases = afRegisteredAliases
   receiverEffects = afRegisteredActiveMagicEffects
   RegisterForSingleUpdate(0.01)
-  debug.trace(" <<<< Returning from Fallback Event Send.")
   return true
 endFunction
 
 Event OnUpdate()
-  debug.trace(" |||| Starting Send.")
-
   int i = 0
   int registered_form_count = ArrayCountForm(receiverForms)
-  debug.trace("Registered fallback event forms: " + receiverForms)
   while i < registered_form_count
-    debug.trace("calling event on " + receiverForms[i] as FallbackEventReceiverForm)
     (receiverForms[i] as FallbackEventReceiverForm).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
     i += 1
   endWhile
@@ -98,21 +111,21 @@ Event OnUpdate()
 
   sender.Release(self)
   Dispose()
-
-  debug.trace(" |||| Ending Send.")
 EndEvent
 
 function Dispose()
-  pushedBools = new Bool[32]
-  pushedInts = new Int[32]
-  pushedFloats = new Float[32]
-  pushedStrings = new String[32]
-  pushedForms = new Form[32]
+  pushedBools = new Bool[1]
+  pushedInts = new Int[1]
+  pushedFloats = new Float[1]
+  pushedStrings = new String[1]
+  pushedForms = new Form[1]
+  receiverForms = new Form[1]
+  receiverAliases = new Alias[1]
+  receiverEffects = new ActiveMagicEffect[1]
   sender = None
   eventName = ""
   self.Disable()
   self.Delete()
-  debug.trace("Disposing of handler " + self)
 endFunction
 
 function WaitForInitialization()

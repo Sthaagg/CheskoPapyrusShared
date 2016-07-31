@@ -3,11 +3,14 @@ scriptname FallbackEventEmitter extends Quest
 
 import CommonArrayHelper
 
+Actor property PlayerRef auto
+{Link to the Player actor reference.}
+
 Activator property FallbackEventHandleMarker auto
 {Link to your event handler marker object. See the CheskoPapyrusShared readme for more info.}
 
 bool property UseSKSEModEvents = true auto
-{If false, events from this emitter will only be registered / sent via Fallback Events.}
+{Default: true. If false, events from this emitter will only be registered / sent via Fallback Events.}
 
 int property SKSE_MIN_VERSION = 10700 auto hidden ; Version that ModEvent was introduced
 
@@ -27,7 +30,7 @@ int function Create(string asEventName)
   if IsSKSELoaded()
     return ModEvent.Create(asEventName)
   else
-    ObjectReference handle = Game.GetPlayer().PlaceAtMe(FallbackEventHandleMarker)
+    ObjectReference handle = PlayerRef.PlaceAtMe(FallbackEventHandleMarker)
     (handle as FallbackEventHandler).sender = self
     (handle as FallbackEventHandler).eventName = asEventName
     ArrayAddForm(handles, handle as Form)
@@ -37,22 +40,21 @@ endFunction
 
 bool function Send(int handle)
   if IsSKSELoaded()
-    debug.trace("Sending the event via SKSE.")
+    debug.trace(self + " sending the event via SKSE.")
     return ModEvent.Send(handle)
   else
-    debug.trace("Sending the event via fallback.")
+    debug.trace(self + " sending the event via fallback.")
     return (handles[handle - 1] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
   endif
 endFunction
 
 function Release(FallbackEventHandler akHandler)
   if akHandler
-    ArrayRemoveForm(handles, akHandler)
+    ArrayRemoveForm(handles, akHandler, true)
   endif
 endFunction
 
 function RegisterFormForModEventWithFallback(string asEventName, string asCallbackName, Form akReceiver)
-  debug.trace("Registering " + akReceiver + " for event " + asEventName)
   if IsSKSELoaded()
     akReceiver.RegisterForModEvent(asEventName, asCallbackName)
   else
@@ -61,6 +63,7 @@ function RegisterFormForModEventWithFallback(string asEventName, string asCallba
       int idx = registeredForms.Find(akReceiver)
       if idx == -1
         ArrayAddForm(registeredForms, akReceiver)
+        ArraySortForm(registeredForms)
       endif
     endif
   endif
@@ -75,6 +78,7 @@ function RegisterAliasForModEventWithFallback(string asEventName, string asCallb
       int idx = registeredAliases.Find(akReceiver)
       if idx == -1
         ArrayAddAlias(registeredAliases, akReceiver)
+        ArraySortAlias(registeredAliases)
       endif
     endif
   endif
@@ -89,6 +93,7 @@ function RegisterActiveMagicEffectForModEventWithFallback(string asEventName, st
       int idx = registeredActiveMagicEffects.Find(akReceiver)
       if idx == -1
         ArrayAddActiveMagicEffect(registeredActiveMagicEffects, akReceiver)
+        ArraySortActiveMagicEffect(registeredActiveMagicEffects)
       endif
     endif
   endif
@@ -175,8 +180,6 @@ function PushForm(int handle, form value)
 endFunction
 
 bool function IsSKSELoaded()
-  ; For testing, force it to fail.
-  return false
 	bool skse_loaded = SKSE.GetVersion()
   if skse_loaded
 		int skse_version = (SKSE.GetVersion() * 10000) + (SKSE.GetVersionMinor() * 100) + SKSE.GetVersionBeta()

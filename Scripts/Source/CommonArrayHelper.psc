@@ -425,9 +425,80 @@ bool function ArraySortFormList(FormList[] akArray, int i = 0) global
 					if !(IsNone(akArray[i]))
 						 akArray[iFirstNonePos] = akArray[i]
 						 akArray[i] = none
-
 						 ;Call this function recursively until it returns
 						 ArraySortFormList(akArray, iFirstNonePos + 1)
+						 return true
+					else
+						 i += 1
+					endif
+			   else
+					i += 1
+			   endif
+		  endif
+	 endWhile
+	 return false
+endFunction
+
+bool function ArraySortAlias(Alias[] akArray, int i = 0) global
+	;Removes blank elements by shifting all elements down.
+	;		   false		=			   No sorting required
+	;		   true			=			   Success
+	 bool bFirstNoneFound = false
+	 int iFirstNonePos = i
+	 while i < akArray.Length
+		  if !(akArray[i])
+		  	   akArray[i] = none
+			   if bFirstNoneFound == false
+					bFirstNoneFound = true
+					iFirstNonePos = i
+					i += 1
+			   else
+					i += 1
+			   endif
+		  else
+			   if bFirstNoneFound == true
+			   ;check to see if it's a couple of blank entries in a row
+					if (akArray[i])
+						 akArray[iFirstNonePos] = akArray[i]
+						 akArray[i] = none
+						 ;Call this function recursively until it returns
+						 ArraySortAlias(akArray, iFirstNonePos + 1)
+						 return true
+					else
+						 i += 1
+					endif
+			   else
+					i += 1
+			   endif
+		  endif
+	 endWhile
+	 return false
+endFunction
+
+bool function ArraySortActiveMagicEffect(ActiveMagicEffect[] akArray, int i = 0) global
+	;Removes blank elements by shifting all elements down.
+	;		   false		=			   No sorting required
+	;		   true			=			   Success
+	 bool bFirstNoneFound = false
+	 int iFirstNonePos = i
+	 while i < akArray.Length
+		  if !(akArray[i])
+		  	   akArray[i] = none
+			   if bFirstNoneFound == false
+					bFirstNoneFound = true
+					iFirstNonePos = i
+					i += 1
+			   else
+					i += 1
+			   endif
+		  else
+			   if bFirstNoneFound == true
+			   ;check to see if it's a couple of blank entries in a row
+					if (akArray[i])
+						 akArray[iFirstNonePos] = akArray[i]
+						 akArray[i] = none
+						 ;Call this function recursively until it returns
+						 ArraySortActiveMagicEffect(akArray, iFirstNonePos + 1)
 						 return true
 					else
 						 i += 1
