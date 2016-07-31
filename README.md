@@ -1,5 +1,8 @@
 # Chesko Papyrus Shared Libraries
-Shared code and libraries I use for many different mods for Skyrim.
+Shared code and libraries I use for many different mods for Skyrim. All code in
+this repository is licensed under the MIT License. Please familiarize yourself
+with it as the MIT License was intended to be read and understood by ordinary
+people, unlike other licenses.
 
 ##Common Array Helper
 `CommonArrayHelper.psc` contains many functions that make interacting with
