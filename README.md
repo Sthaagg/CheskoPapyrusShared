@@ -215,6 +215,8 @@ from trying to use an SKSE Mod Event, even if the user has SKSE installed.
 ###Pros
 
 * Fallback Events work even if the user doesn't have SKSE installed.
+* By default, the system still takes advantage of SKSE ModEvents if SKSE is available,
+from the same set of code.
 * They will (presumably) work on consoles.
 * Using them (sending, creating, pushing data, etc) in code feels familiar to
 using Mod Events.
