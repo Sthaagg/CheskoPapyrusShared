@@ -1,6 +1,6 @@
 # Chesko Papyrus Shared Libraries
 Shared code and libraries I use for many different mods for Skyrim. All code in
-this repository is licensed under the MIT License. Please familiarize yourself
+this repository is [licensed under the MIT License](https://github.com/chesko256/CheskoPapyrusShared/blob/master/LICENSE). Please familiarize yourself
 with it as the MIT License was intended to be read and understood by ordinary
 people, unlike other licenses.
 
