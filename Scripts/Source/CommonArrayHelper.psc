@@ -186,6 +186,49 @@ bool function ArrayRemoveForm(Form[] akArray, Form akValue, bool abSort = false)
 
 endFunction
 
+bool function ArrayRemoveAlias(Alias[] akArray, Alias akValue, bool abSort = false) global
+    ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
+    ;       false       =       Error (string not found)
+    ;       true        =       Success
+
+    int i = 0
+    while i < akArray.Length
+        if akArray[i] == akValue
+            akArray[i] = None
+            if abSort == true
+                ArraySortAlias(akArray)
+            endif
+            return true
+        else
+            i += 1
+        endif
+    endWhile
+
+    return false
+endFunction
+
+bool function ArrayRemoveActiveMagicEffect(ActiveMagicEffect[] akArray, ActiveMagicEffect akValue, bool abSort = false) global
+    ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
+    ;       false       =       Error (string not found)
+    ;       true        =       Success
+
+    int i = 0
+    while i < akArray.Length
+        if akArray[i] == akValue
+            akArray[i] = None
+            if abSort == true
+                ArraySortActiveMagicEffect(akArray)
+            endif
+            return true
+        else
+            i += 1
+        endif
+    endWhile
+
+    return false
+endFunction
+
+
 bool function ArrayRemoveFormList(FormList[] akArray, FormList akValue, bool abSort = false) global
     ;Removes a FormList from the array, if found. Sorts the array using ArraySort() if bSort is true.
     ;       false       =       Error (string not found)
