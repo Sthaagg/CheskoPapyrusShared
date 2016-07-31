@@ -11,11 +11,14 @@ All of the functions are global, so to use this library in your project, just
 `import CommonArrayHelper`.
 
 ##Fallback Events
+
+####[Fallback Event API Reference](https://github.com/chesko256/CheskoPapyrusShared/wiki/Fallback-Event-API-Reference)
+
 The **Fallback Event library** allows you to register for custom events. If SKSE
 is available on the user's system, by default, it will use the SKSE ModEvent
 system. If SKSE isn't available, it will "fall back" to using a vanilla-only
 custom event implementation. You can also bypass the default behavior and elect
-to only use the Fallback Event system.
+to only use the Fallback Event system ([see note](https://github.com/chesko256/CheskoPapyrusShared#note-disabling-skse-mod-events)).
 
 This library is handy for creating or retrofitting mods that rely on Mod Events
 to work on console platforms, or on PCs that do not have SKSE installed, while

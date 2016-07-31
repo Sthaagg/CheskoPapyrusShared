@@ -40,7 +40,9 @@ int function Create(string asEventName)
     (handle as FallbackEventHandler).sender = self
     (handle as FallbackEventHandler).eventName = asEventName
     ArrayAddForm(handles, handle as Form)
-    return handles.Find(handle as Form) + 1
+    int handleID = handles.Find(handle as Form) + 1
+    (handle as FallbackEventHandler).handleID = handleID
+    return handleID
   endif
 endFunction
 
@@ -54,9 +56,11 @@ bool function Send(int handle)
   endif
 endFunction
 
-function Release(FallbackEventHandler akHandler)
-  if akHandler
-    ArrayRemoveForm(handles, akHandler, true)
+function Release(int handle)
+  if IsSKSELoaded()
+    ModEvent.Release(handle)
+  else
+    ArrayRemoveForm(handles, handles[handle - 1], true)
   endif
 endFunction
 
