@@ -2,7 +2,7 @@ scriptname FallbackEventHandler extends ObjectReference
 
 import CommonArrayHelper
 
-FallbackEventSender property sender auto hidden
+FallbackEventEmitter property sender auto hidden
 string property eventName auto hidden
 Form[] receiverForms
 Alias[] receiverAliases

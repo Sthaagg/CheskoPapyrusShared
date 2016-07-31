@@ -147,8 +147,6 @@ bool function ArrayAddFloat(float[] afArray, float afValue, float afInsertAtValu
 	return false
 endFunction
 
-<<<<<<< HEAD
-=======
 bool function ArrayAddString(String[] asArray, String asValue) global
 	;Adds a form to the first available non-None element in the array.
 	;		false		=		Error (array full)
@@ -166,7 +164,6 @@ bool function ArrayAddString(String[] asArray, String asValue) global
 	return false
 endFunction
 
->>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 bool function ArrayRemoveForm(Form[] akArray, Form akValue, bool abSort = false) global
     ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
     ;       false       =       Error (string not found)
@@ -183,11 +180,10 @@ bool function ArrayRemoveForm(Form[] akArray, Form akValue, bool abSort = false)
         else
             i += 1
         endif
-<<<<<<< HEAD
-    endWhile    
+    endWhile
 
     return false
-    
+
 endFunction
 
 bool function ArrayRemoveFormList(FormList[] akArray, FormList akValue, bool abSort = false) global
@@ -206,10 +202,10 @@ bool function ArrayRemoveFormList(FormList[] akArray, FormList akValue, bool abS
         else
             i += 1
         endif
-    endWhile    
+    endWhile
 
     return false
-    
+
 endFunction
 
 bool function ArrayRemoveMessage(Message[] akArray, Message akValue, bool abSort = false) global
@@ -228,21 +224,12 @@ bool function ArrayRemoveMessage(Message[] akArray, Message akValue, bool abSort
         else
             i += 1
         endif
-    endWhile    
-
-    return false
-    
-endFunction
-
-
-=======
     endWhile
 
     return false
 
 endFunction
 
->>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 bool function ArrayRemoveArmor(Armor[] akArray, Armor akValue, bool abSort = false) global
     ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
     ;       false       =       Error (string not found)
@@ -254,50 +241,6 @@ bool function ArrayRemoveArmor(Armor[] akArray, Armor akValue, bool abSort = fal
             akArray[i] = None
             if abSort == true
                 ArraySortArmor(akArray)
-            endif
-            return true
-        else
-            i += 1
-        endif
-    endWhile
-
-    return false
-
-endFunction
-
-bool function ArrayRemoveMessage(Message[] akArray, Message akValue, bool abSort = false) global
-    ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
-    ;       false       =       Error (string not found)
-    ;       true        =       Success
-
-    int i = 0
-    while i < akArray.Length
-        if akArray[i] == akValue
-            akArray[i] = None
-            if abSort == true
-                ArraySortMessage(akArray)
-            endif
-            return true
-        else
-            i += 1
-        endif
-    endWhile
-
-    return false
-
-endFunction
-
-bool function ArrayRemoveFormList(FormList[] akArray, FormList akValue, bool abSort = false) global
-    ;Removes a form from the array, if found. Sorts the array using ArraySort() if bSort is true.
-    ;       false       =       Error (string not found)
-    ;       true        =       Success
-
-    int i = 0
-    while i < akArray.Length
-        if akArray[i] == akValue
-            akArray[i] = None
-            if abSort == true
-                ArraySortFormList(akArray)
             endif
             return true
         else
@@ -427,11 +370,6 @@ bool function ArraySortMessage(Message[] akArray, int i = 0) global
 	;Removes blank elements by shifting all elements down.
 	;		   false		=			   No sorting required
 	;		   true			=			   Success
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 	 bool bFirstNoneFound = false
 	 int iFirstNonePos = i
 	 while i < akArray.Length
@@ -450,11 +388,7 @@ bool function ArraySortMessage(Message[] akArray, int i = 0) global
 					if !(IsNone(akArray[i]))
 						 akArray[iFirstNonePos] = akArray[i]
 						 akArray[i] = none
-<<<<<<< HEAD
- 
-=======
 
->>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 						 ;Call this function recursively until it returns
 						 ArraySortMessage(akArray, iFirstNonePos + 1)
 						 return true
@@ -473,11 +407,6 @@ bool function ArraySortFormList(FormList[] akArray, int i = 0) global
 	;Removes blank elements by shifting all elements down.
 	;		   false		=			   No sorting required
 	;		   true			=			   Success
-<<<<<<< HEAD
- 
-=======
-
->>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 	 bool bFirstNoneFound = false
 	 int iFirstNonePos = i
 	 while i < akArray.Length
@@ -496,11 +425,7 @@ bool function ArraySortFormList(FormList[] akArray, int i = 0) global
 					if !(IsNone(akArray[i]))
 						 akArray[iFirstNonePos] = akArray[i]
 						 akArray[i] = none
-<<<<<<< HEAD
- 
-=======
 
->>>>>>> 890349a3903fe602be4d9f7fbd9aa9d9bc624e86
 						 ;Call this function recursively until it returns
 						 ArraySortFormList(akArray, iFirstNonePos + 1)
 						 return true
