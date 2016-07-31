@@ -35,7 +35,7 @@ Fallback Events require some additional objects in the Creation Kit in order to
 set them up, as well as some additional code. These steps are detailed below.
 
 ### Example Implementation
-Frostfall has already successfully implemented Fallback Events in some of its
+**Frostfall** has already successfully implemented Fallback Events in some of its
 code as it begins aligning itself towards becoming console-compatible. You can
 see an example by looking at [_Frost_ClimateSystem](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_ClimateSystem.psc),
 which registers for an event `OnTamrielRegionChange`, and [_Frost_RegionDetectScript](https://github.com/chesko256/Campfire/blob/NewExposureSystem/Scripts/Source/_Frost_RegionDetectScript.psc),
