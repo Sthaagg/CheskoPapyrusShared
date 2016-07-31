@@ -24,6 +24,7 @@ Event OnInit()
   pushedStrings = new string[32]
   pushedForms = new form[32]
   initialized = true
+  debug.trace("Handler " + self + " initialized.")
 endEvent
 
 bool function IsInitialized()
@@ -35,23 +36,28 @@ bool function IsInitialized()
 endFunction
 
 function PushBool(bool value)
+  WaitForInitialization()
   ArrayAddBool(pushedBools, value, pushedBoolCount)
   pushedBoolCount += 1
 endFunction
 
 function PushInt(int value)
+  WaitForInitialization()
   ArrayAddInt(pushedInts, value)
 endFunction
 
 function PushFloat(float value)
+  WaitForInitialization()
   ArrayAddFloat(pushedFloats, value)
 endFunction
 
 function PushString(string value)
+  WaitForInitialization()
   ArrayAddString(pushedStrings, value)
 endFunction
 
 function PushForm(form value)
+  WaitForInitialization()
   ArrayAddForm(pushedForms, value)
 endFunction
 
@@ -106,4 +112,13 @@ function Dispose()
   eventName = ""
   self.Disable()
   self.Delete()
+  debug.trace("Disposing of handler " + self)
+endFunction
+
+function WaitForInitialization()
+  int i = 0
+  while i < 20 && !initialized
+    Utility.Wait(0.1)
+    i += 1
+  endWhile
 endFunction
