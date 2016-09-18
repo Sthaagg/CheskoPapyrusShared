@@ -1,5 +1,6 @@
 scriptname FallbackEventEmitter extends Quest
-{Allows registration and emitting of mod event using SKSE or in SKSE-less fallback mode.}
+{Allows registration and emitting of mod event using SKSE or in SKSE-less
+fallback mode.}
 
 import CommonArrayHelper
 
@@ -7,10 +8,17 @@ Actor property PlayerRef auto
 {Link to the Player actor reference.}
 
 Activator property FallbackEventHandleMarker auto
-{Link to your event handler marker object. See the CheskoPapyrusShared readme for more info.}
+{Link to your event handler marker object. See the CheskoPapyrusShared readme
+for more info.}
 
 bool property UseSKSEModEvents = true auto
-{Default: true. If false, events from this emitter will only be registered / sent via Fallback Events.}
+{Default: true. If false, events from this emitter will only be registered /
+sent via Fallback Events.}
+
+bool property UseStaticEventHandler = false auto
+{Default: false. If true, the emitter will spawn a single event handler and keep
+it loaded in the engine. Good for routine, periodic events where constantly
+creating and destroying event handlers is less desirable.}
 
 int property SKSE_MIN_VERSION = 10700 auto hidden ; Version that ModEvent was introduced
 
@@ -36,13 +44,25 @@ int function Create(string asEventName)
   if IsSKSELoaded()
     return ModEvent.Create(asEventName)
   else
-    ObjectReference handle = PlayerRef.PlaceAtMe(FallbackEventHandleMarker)
-    (handle as FallbackEventHandler).sender = self
-    (handle as FallbackEventHandler).eventName = asEventName
-    ArrayAddForm(handles, handle as Form)
-    int handleID = handles.Find(handle as Form) + 1
-    (handle as FallbackEventHandler).handleID = handleID
-    return handleID
+    if UseStaticEventHandler
+      if !handles[0]
+        ObjectReference handle = PlayerRef.PlaceAtMe(FallbackEventHandleMarker)
+        debug.trace(self + " generated a new static event handler " + handle)
+        (handle as FallbackEventHandler).sender = self
+        (handle as FallbackEventHandler).isStaticHandler = true
+        (handle as FallbackEventHandler).eventName = asEventName
+        handles[0] = handle as Form
+      endif
+      return 1
+    else
+      ObjectReference handle = PlayerRef.PlaceAtMe(FallbackEventHandleMarker)
+      (handle as FallbackEventHandler).sender = self
+      (handle as FallbackEventHandler).eventName = asEventName
+      ArrayAddForm(handles, handle as Form)
+      int handleID = handles.Find(handle as Form) + 1
+      (handle as FallbackEventHandler).handleID = handleID
+      return handleID
+    endif
   endif
 endFunction
 
@@ -52,7 +72,16 @@ bool function Send(int handle)
     return ModEvent.Send(handle)
   else
     debug.trace(self + " sending the event via fallback.")
-    return (handles[handle - 1] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
+    if UseStaticEventHandler
+      if handles[0]
+        return (handles[0] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
+      else
+        debug.trace(self + " attempted to send a fallback event before a static handler was created.")
+        return false
+      endif
+    else
+      return (handles[handle - 1] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
+    endif
   endif
 endFunction
 

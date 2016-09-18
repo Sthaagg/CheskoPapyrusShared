@@ -113,7 +113,6 @@ endProperty
 
 ; @override SKI_WidgetBase
 event OnWidgetReset()
-	;debug.trace("[Frostfall] SKI_MeterWidget OnWidgetReset()")
 	parent.OnWidgetReset()
 
 	; Init numbers

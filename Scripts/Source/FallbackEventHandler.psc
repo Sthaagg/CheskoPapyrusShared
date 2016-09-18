@@ -5,6 +5,7 @@ import CommonArrayHelper
 FallbackEventEmitter property sender auto hidden
 string property eventName auto hidden
 int property handleID auto hidden
+bool property isStaticHandler auto hidden
 Form[] receiverForms
 Alias[] receiverAliases
 ActiveMagicEffect[] receiverEffects
@@ -110,23 +111,25 @@ Event OnUpdate()
     i += 1
   endWhile
 
-  sender.Release(handleID)
   Dispose()
 EndEvent
 
 function Dispose()
-  pushedBools = new Bool[1]
-  pushedInts = new Int[1]
-  pushedFloats = new Float[1]
-  pushedStrings = new String[1]
-  pushedForms = new Form[1]
-  receiverForms = new Form[1]
-  receiverAliases = new Alias[1]
-  receiverEffects = new ActiveMagicEffect[1]
-  sender = None
-  eventName = ""
-  self.Disable()
-  self.Delete()
+  pushedBools = new Bool[32]
+  pushedInts = new Int[32]
+  pushedFloats = new Float[32]
+  pushedStrings = new String[32]
+  pushedForms = new Form[32]
+  if !isStaticHandler
+    sender.Release(handleID)
+    receiverForms = new Form[128]
+    receiverAliases = new Alias[128]
+    receiverEffects = new ActiveMagicEffect[128]
+    sender = None
+    eventName = ""
+    self.Disable()
+    self.Delete()
+  endif
 endFunction
 
 function WaitForInitialization()
