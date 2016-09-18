@@ -47,7 +47,7 @@ int function Create(string asEventName)
     if UseStaticEventHandler
       if !handles[0]
         ObjectReference handle = PlayerRef.PlaceAtMe(FallbackEventHandleMarker)
-        debug.trace(self + " generated a new static event handler " + handle)
+        ; debug.trace(self + " generated a new static event handler " + handle)
         (handle as FallbackEventHandler).sender = self
         (handle as FallbackEventHandler).isStaticHandler = true
         (handle as FallbackEventHandler).eventName = asEventName
@@ -68,10 +68,10 @@ endFunction
 
 bool function Send(int handle)
   if IsSKSELoaded()
-    debug.trace(self + " sending the event via SKSE.")
+    ; debug.trace(self + " sending the event via SKSE.")
     return ModEvent.Send(handle)
   else
-    debug.trace(self + " sending the event via fallback.")
+    ; debug.trace(self + " sending the event via fallback.")
     if UseStaticEventHandler
       if handles[0]
         return (handles[0] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
