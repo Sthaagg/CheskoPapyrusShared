@@ -1,4 +1,4 @@
-scriptname FallbackEventEmitter extends Quest
+scriptname FallbackEventEmitter extends ReferenceAlias
 {Allows registration and emitting of mod event using SKSE or in SKSE-less
 fallback mode.}
 
@@ -23,6 +23,7 @@ creating and destroying event handlers is less desirable.}
 int property SKSE_MIN_VERSION = 10700 auto hidden ; Version that ModEvent was introduced
 
 int VERSION = 1 ; Fallback Event API version
+bool isSKSELoaded = false
 
 Form[] registeredForms
 Alias[] registeredAliases
@@ -34,6 +35,11 @@ Event OnInit()
   registeredAliases = new Alias[128]
   registeredActiveMagicEffects = new ActiveMagicEffect[128]
   handles = new Form[128]
+  isSKSELoaded = CheckSKSELoaded()
+EndEvent
+
+Event OnPlayerLoadGame()
+  isSKSELoaded = CheckSKSELoaded()
 EndEvent
 
 int function GetVersion()
@@ -41,13 +47,13 @@ int function GetVersion()
 endFunction
 
 int function Create(string asEventName)
-  if IsSKSELoaded()
+  if isSKSELoaded
     return ModEvent.Create(asEventName)
   else
     if UseStaticEventHandler
       if !handles[0]
         ObjectReference handle = PlayerRef.PlaceAtMe(FallbackEventHandleMarker)
-        ; debug.trace(self + " generated a new static event handler " + handle)
+        debug.trace(self + " generated a new static event handler " + handle)
         (handle as FallbackEventHandler).sender = self
         (handle as FallbackEventHandler).isStaticHandler = true
         (handle as FallbackEventHandler).eventName = asEventName
@@ -56,6 +62,7 @@ int function Create(string asEventName)
       return 1
     else
       ObjectReference handle = PlayerRef.PlaceAtMe(FallbackEventHandleMarker)
+      debug.trace(self + " generated an event handler " + handle)
       (handle as FallbackEventHandler).sender = self
       (handle as FallbackEventHandler).eventName = asEventName
       ArrayAddForm(handles, handle as Form)
@@ -67,26 +74,30 @@ int function Create(string asEventName)
 endFunction
 
 bool function Send(int handle)
-  if IsSKSELoaded()
+  if isSKSELoaded
     ; debug.trace(self + " sending the event via SKSE.")
     return ModEvent.Send(handle)
   else
     ; debug.trace(self + " sending the event via fallback.")
     if UseStaticEventHandler
       if handles[0]
-        return (handles[0] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
+        bool sent = (handles[0] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
+        debug.trace(self + " sent event: " + sent)
+        return sent
       else
         debug.trace(self + " attempted to send a fallback event before a static handler was created.")
         return false
       endif
     else
-      return (handles[handle - 1] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
+      bool sent = (handles[handle - 1] as FallbackEventHandler).Send(registeredForms, registeredAliases, registeredActiveMagicEffects)
+      debug.trace(self + " sent event: " + sent)
+      return sent
     endif
   endif
 endFunction
 
 function Release(int handle)
-  if IsSKSELoaded()
+  if isSKSELoaded
     ModEvent.Release(handle)
   else
     ArrayRemoveForm(handles, handles[handle - 1], true)
@@ -94,7 +105,7 @@ function Release(int handle)
 endFunction
 
 function RegisterFormForModEventWithFallback(string asEventName, string asCallbackName, Form akReceiver)
-  if IsSKSELoaded()
+  if isSKSELoaded
     akReceiver.RegisterForModEvent(asEventName, asCallbackName)
   else
     FallbackEventReceiverForm receiver = akReceiver as FallbackEventReceiverForm
@@ -109,7 +120,7 @@ function RegisterFormForModEventWithFallback(string asEventName, string asCallba
 endFunction
 
 function UnregisterFormForModEventWithFallback(string asEventName, Form akReceiver)
-  if IsSKSELoaded()
+  if isSKSELoaded
     akReceiver.UnregisterForModEvent(asEventName)
   else
     FallbackEventReceiverForm receiver = akReceiver as FallbackEventReceiverForm
@@ -120,7 +131,7 @@ function UnregisterFormForModEventWithFallback(string asEventName, Form akReceiv
 endFunction
 
 function RegisterAliasForModEventWithFallback(string asEventName, string asCallbackName, Alias akReceiver)
-  if IsSKSELoaded()
+  if isSKSELoaded
     akReceiver.RegisterForModEvent(asEventName, asCallbackName)
   else
     FallbackEventReceiverAlias receiver = akReceiver as FallbackEventReceiverAlias
@@ -135,7 +146,7 @@ function RegisterAliasForModEventWithFallback(string asEventName, string asCallb
 endFunction
 
 function UnregisterAliasForModEventWithFallback(string asEventName, Alias akReceiver)
-  if IsSKSELoaded()
+  if isSKSELoaded
     akReceiver.UnregisterForModEvent(asEventName)
   else
     FallbackEventReceiverAlias receiver = akReceiver as FallbackEventReceiverAlias
@@ -146,7 +157,7 @@ function UnregisterAliasForModEventWithFallback(string asEventName, Alias akRece
 endFunction
 
 function RegisterActiveMagicEffectForModEventWithFallback(string asEventName, string asCallbackname, ActiveMagicEffect akReceiver)
-  if IsSKSELoaded()
+  if isSKSELoaded
     akReceiver.RegisterForModEvent(asEventName, asCallbackName)
   else
     FallbackEventReceiverActiveMagicEffect receiver = akReceiver as FallbackEventReceiverActiveMagicEffect
@@ -161,7 +172,7 @@ function RegisterActiveMagicEffectForModEventWithFallback(string asEventName, st
 endFunction
 
 function UnregisterActiveMagicEffectForModEventWithFallback(string asEventName, ActiveMagicEffect akReceiver)
-  if IsSKSELoaded()
+  if isSKSELoaded
     akReceiver.UnregisterForModEvent(asEventName)
   else
     FallbackEventReceiverActiveMagicEffect receiver = akReceiver as FallbackEventReceiverActiveMagicEffect
@@ -172,7 +183,7 @@ function UnregisterActiveMagicEffectForModEventWithFallback(string asEventName, 
 endFunction
 
 function PushBool(int handle, bool value)
-  if IsSKSELoaded()
+  if isSKSELoaded
     ModEvent.PushBool(handle, value)
   else
     FallbackEventHandler handleref = handles[handle - 1] as FallbackEventHandler
@@ -188,7 +199,7 @@ function PushBool(int handle, bool value)
 endFunction
 
 function PushInt(int handle, int value)
-  if IsSKSELoaded()
+  if isSKSELoaded
     ModEvent.PushInt(handle, value)
   else
     FallbackEventHandler handleref = handles[handle - 1] as FallbackEventHandler
@@ -204,7 +215,7 @@ function PushInt(int handle, int value)
 endFunction
 
 function PushFloat(int handle, float value)
-  if IsSKSELoaded()
+  if isSKSELoaded
     ModEvent.PushFloat(handle, value)
   else
     FallbackEventHandler handleref = handles[handle - 1] as FallbackEventHandler
@@ -220,7 +231,7 @@ function PushFloat(int handle, float value)
 endFunction
 
 function PushString(int handle, string value)
-  if IsSKSELoaded()
+  if isSKSELoaded
     ModEvent.PushString(handle, value)
   else
     FallbackEventHandler handleref = handles[handle - 1] as FallbackEventHandler
@@ -236,7 +247,7 @@ function PushString(int handle, string value)
 endFunction
 
 function PushForm(int handle, form value)
-  if IsSKSELoaded()
+  if isSKSELoaded
     ModEvent.PushForm(handle, value)
   else
     FallbackEventHandler handleref = handles[handle - 1] as FallbackEventHandler
@@ -251,7 +262,7 @@ function PushForm(int handle, form value)
   endif
 endFunction
 
-bool function IsSKSELoaded()
+bool function CheckSKSELoaded()
   if !UseSKSEModEvents
     return false
   endif

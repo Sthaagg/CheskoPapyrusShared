@@ -93,6 +93,7 @@ Event OnUpdate()
   int i = 0
   int registered_form_count = ArrayCountForm(receiverForms)
   while i < registered_form_count
+    debug.trace(self + " raising " + eventName + " to registered form " + receiverForms[i])
     (receiverForms[i] as FallbackEventReceiverForm).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
     i += 1
   endWhile
@@ -100,6 +101,7 @@ Event OnUpdate()
   i = 0
   int registered_alias_count = ArrayCountAlias(receiverAliases)
   while i < registered_alias_count
+    debug.trace(self + " raising " + eventName + " to registered alias " + receiverAliases[i])
     (receiverAliases[i] as FallbackEventReceiverAlias).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
     i += 1
   endWhile
@@ -107,6 +109,7 @@ Event OnUpdate()
   i = 0
   int registered_effect_count = ArrayCountActiveMagicEffect(receiverEffects)
   while i < registered_effect_count
+    debug.trace(self + " raising " + eventName + " to registered effect " + receiverEffects[i])
     (receiverEffects[i] as FallbackEventReceiverActiveMagicEffect).RaiseEvent(eventName, pushedBools, pushedInts, pushedFloats, pushedForms, pushedStrings)
     i += 1
   endWhile

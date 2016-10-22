@@ -673,3 +673,412 @@ bool function IsNone(Form akForm) global
 		return true
 	endif
 endFunction
+
+bool function LinkedArrayAddForm(Form akForm, Form[] akArray1, Form[] akArray2, Form[] akArray3, Form[] akArray4) global
+    ; Adds a form to the first available element in the first available array
+	; associated with this ArrayID.
+
+	; Return values
+    ; false 	=               Error (linked array full)
+    ; true		=               Success
+
+    int idx = -1
+    idx = akArray1.Find(none)
+    if idx != -1
+    	akArray1[idx] = akForm
+    	return true
+    endif
+
+    idx = -1
+    idx = akArray2.Find(none)
+    if idx != -1
+    	akArray2[idx] = akForm
+    	return true
+    endif
+
+    idx = -1
+    idx = akArray3.Find(none)
+    if idx != -1
+    	akArray3[idx] = akForm
+    	return true
+    endif
+
+    idx = -1
+    idx = akArray4.Find(none)
+    if idx != -1
+    	akArray4[idx] = akForm
+    	return true
+    endif
+
+    return false
+endFunction
+
+bool function LinkedArrayRemoveForm(Form akForm, Form[] akArray1, Form[] akArray2, Form[] akArray3, Form[] akArray4, bool abSort = true) global
+	; Removes the first occurrence of a form from the array, if found.
+	
+	; Return values
+	; false 	=		Error (Form not found)
+	; true		=		Success
+
+	int idx = -1
+	idx = akArray1.Find(akForm)
+	if idx != -1
+		akArray1[idx] = none
+		if abSort
+			LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4)
+		endif
+		return true
+	endif
+
+	idx = -1
+	idx = akArray2.Find(akForm)
+	if idx != -1
+		akArray2[idx] = none
+		if abSort
+			LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4)
+		endif
+		return true
+	endif
+
+	idx = -1
+	idx = akArray3.Find(akForm)
+	if idx != -1
+		akArray3[idx] = none
+		if abSort
+			LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4)
+		endif
+		return true
+	endif
+
+	idx = -1
+	idx = akArray4.Find(akForm)
+	if idx != -1
+		akArray4[idx] = none
+		if abSort
+			LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4)
+		endif
+		return true
+	endif
+
+	return false
+endFunction
+
+bool function LinkedArrayHasForm(Form akForm, Form[] akArray1, Form[] akArray2, Form[] akArray3, Form[] akArray4) global
+	; Attempts to find the given form in the associated array ID, and returns true if found
+	
+	; Return values
+	; false		= 		Form not found
+	; true 		=		Form found
+
+	if akArray1.Find(akForm) != -1
+		return true
+	elseif akArray2.Find(akForm) != -1
+		return true
+	elseif akArray3.Find(akForm) != -1
+		return true
+	elseif akArray4.Find(akForm) != -1
+		return true
+	else
+		return false
+	endif
+endFunction
+
+function LinkedArrayClearForms128(Form[] akArray1, Form[] akArray2, Form[] akArray3, Form[] akArray4) global
+	; Reinitializes and clears linked arrays into Form[128] arrays.
+	
+	; Return values
+	; none
+
+	akArray1 = new Form[128]
+	akArray2 = new Form[128]
+	akArray3 = new Form[128]
+	akArray4 = new Form[128]
+endFunction
+
+function LinkedArrayRemoveInvalidForms(Form[] akArray1, Form[] akArray2, Form[] akArray3, Form[] akArray4) global
+	; Clears all arrays of invalid forms ([Form <None>]) and re-sorts.
+
+	; Return values
+	; none
+
+	bool foundInvalidForm = false
+	int i = 0
+	while i < akArray1.Length
+		if akArray1[i] == "[Form <None>]"
+			akArray1[i] = none
+			foundInvalidForm = true
+		endif
+		i += 1
+	endWhile
+	
+	i = 0
+	while i < akArray2.Length
+		if akArray2[i] == "[Form <None>]"
+			akArray2[i] = none
+			foundInvalidForm = true
+		endif
+		i += 1
+	endWhile
+	
+	i = 0
+	while i < akArray3.Length
+		if akArray3[i] == "[Form <None>]"
+			akArray3[i] = none
+			foundInvalidForm = true
+		endif
+		i += 1
+	endWhile
+	
+	i = 0
+	while i < akArray4.Length
+		if akArray4[i] == "[Form <None>]"
+			akArray4[i] = none
+			foundInvalidForm = true
+		endif
+		i += 1
+	endWhile
+	
+	if foundInvalidForm
+		LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4)
+	endif
+endFunction
+
+int function LinkedArrayCountForms(Form[] akArray1, Form[] akArray2, Form[] akArray3, Form[] akArray4) global
+	;Counts the number of indicies in this linked array that do not have a "none" type
+	
+	; Return values
+	; int myCount = number of indicies that are not "none"
+
+	int myCount = 0
+	
+	int i = 0
+	while i < akArray1.Length
+		if akArray1[i] != none
+			myCount += 1
+			i += 1
+		else
+			i += 1
+		endif
+	endWhile
+	
+	i = 0
+	while i < akArray2.Length
+		if akArray2[i] != none
+			myCount += 1
+			i += 1
+		else
+			i += 1
+		endif
+	endWhile
+	
+	i = 0
+	while i < akArray3.Length
+		if akArray3[i] != none
+			myCount += 1
+			i += 1
+		else
+			i += 1
+		endif
+	endWhile
+	
+	i = 0
+	while i < akArray4.Length
+		if akArray4[i] != none
+			myCount += 1
+			i += 1
+		else
+			i += 1
+		endif
+	endWhile
+	
+	return myCount
+endFunction
+
+bool function LinkedArraySortForms(Form[] akArray1, Form[] akArray2, Form[] akArray3, Form[] akArray4, int i = 0) global
+	; Removes blank elements by shifting all elements down, moving elements
+	; to arrays "below" the current one if necessary.
+	; Optionally starts sorting from element i.
+	
+	; Return values
+	; false 	=           No sorting required
+	; true 		=           Success
+	
+	;debug.trace("Sort Start")
+	bool firstNoneFound = false
+	int firstNoneFoundArrayId = 0
+	int firstNoneIndex = 0
+	while i < 512
+		;Which array am I looking in?
+		int j = 0					;Actual array index to check
+		int myCurrArray				;Current array
+		if i < 128
+			myCurrArray = 1
+			j = i
+		elseif i < 256 && i >= 128
+			j = i - 128
+			myCurrArray = 2
+		elseif i < 384 && i >= 256
+			j = i - 256
+			myCurrArray = 3
+		elseif i < 512 && i >= 384
+			j = i - 384
+			myCurrArray = 4
+		endif
+		
+		if myCurrArray == 1
+			if akArray1[j] == none
+				if firstNoneFound == false
+					firstNoneFound = true
+					firstNoneFoundArrayId = myCurrArray
+					firstNoneIndex = j
+					i += 1
+				else
+					i += 1
+				endif
+			else
+				if firstNoneFound == true
+					;check to see if it's a couple of blank entries in a row
+					if !(akArray1[j] == none)
+						;notification("Moving element " + i + " to index " + firstNoneIndex)
+						if firstNoneFoundArrayId == 1
+							akArray1[firstNoneIndex] = akArray1[j]
+							akArray1[j] = none
+						elseif firstNoneFoundArrayId == 2
+							akArray2[firstNoneIndex] = akArray1[j]
+							akArray1[j] = none
+						elseif firstNoneFoundArrayId == 3
+							akArray3[firstNoneIndex] = akArray1[j]
+							akArray1[j] = none
+						elseif firstNoneFoundArrayId == 4
+							akArray4[firstNoneIndex] = akArray1[j]
+							akArray1[j] = none
+						endif
+						;Call this function recursively until it returns
+						LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4, firstNoneIndex + 1)
+						return true
+					else
+						i += 1
+					endif
+				else
+					i += 1
+				endif
+			endif
+		elseif myCurrArray == 2
+			if akArray2[j] == none
+				if firstNoneFound == false
+					firstNoneFound = true
+					firstNoneFoundArrayId = myCurrArray
+					firstNoneIndex = j
+					i += 1
+				else
+					i += 1
+				endif
+			else
+				if firstNoneFound == true
+					;check to see if it's a couple of blank entries in a row
+					if !(akArray2[j] == none)
+						;notification("Moving element " + i + " to index " + firstNoneIndex)
+						if firstNoneFoundArrayId == 1
+							akArray1[firstNoneIndex] = akArray2[j]
+							akArray2[j] = none
+						elseif firstNoneFoundArrayId == 2
+							akArray2[firstNoneIndex] = akArray2[j]
+							akArray2[j] = none
+						elseif firstNoneFoundArrayId == 3
+							akArray3[firstNoneIndex] = akArray2[j]
+							akArray2[j] = none
+						elseif firstNoneFoundArrayId == 4
+							akArray4[firstNoneIndex] = akArray2[j]
+							akArray2[j] = none
+						endif
+						;Call this function recursively until it returns
+						LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4, firstNoneIndex + 1)
+						return true
+					else
+						i += 1
+					endif
+				else
+					i += 1
+				endif
+			endif
+		elseif myCurrArray == 3
+			if akArray3[j] == none
+				if firstNoneFound == false
+					firstNoneFound = true
+					firstNoneFoundArrayId = myCurrArray
+					firstNoneIndex = j
+					i += 1
+				else
+					i += 1
+				endif
+			else
+				if firstNoneFound == true
+					;check to see if it's a couple of blank entries in a row
+					if !(akArray3[j] == none)
+						;notification("Moving element " + i + " to index " + firstNoneIndex)
+						if firstNoneFoundArrayId == 1
+							akArray1[firstNoneIndex] = akArray3[j]
+							akArray3[j] = none
+						elseif firstNoneFoundArrayId == 2
+							akArray2[firstNoneIndex] = akArray3[j]
+							akArray3[j] = none
+						elseif firstNoneFoundArrayId == 3
+							akArray3[firstNoneIndex] = akArray3[j]
+							akArray3[j] = none
+						elseif firstNoneFoundArrayId == 4
+							akArray4[firstNoneIndex] = akArray3[j]
+							akArray3[j] = none
+						endif
+						;Call this function recursively until it returns
+						LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4, firstNoneIndex + 1)
+						return true
+					else
+						i += 1
+					endif
+				else
+					i += 1
+				endif
+			endif
+		elseif myCurrArray == 4
+			if akArray4[j] == none
+				if firstNoneFound == false
+					firstNoneFound = true
+					firstNoneFoundArrayId = myCurrArray
+					firstNoneIndex = j
+					i += 1
+				else
+					i += 1
+				endif
+			else
+				if firstNoneFound == true
+					;check to see if it's a couple of blank entries in a row
+					if !(akArray4[j] == none)
+						;notification("Moving element " + i + " to index " + firstNoneIndex)
+						if firstNoneFoundArrayId == 1
+							akArray1[firstNoneIndex] = akArray4[j]
+							akArray4[j] = none
+						elseif firstNoneFoundArrayId == 2
+							akArray2[firstNoneIndex] = akArray4[j]
+							akArray4[j] = none
+						elseif firstNoneFoundArrayId == 3
+							akArray3[firstNoneIndex] = akArray4[j]
+							akArray4[j] = none
+						elseif firstNoneFoundArrayId == 4
+							akArray4[firstNoneIndex] = akArray4[j]
+							akArray4[j] = none
+						endif
+						;Call this function recursively until it returns
+						LinkedArraySortForms(akArray1, akArray2, akArray3, akArray4, firstNoneIndex + 1)
+						return true
+					else
+						i += 1
+					endif
+				else
+					i += 1
+				endif
+			endif
+		endif
+	endWhile
+	
+	return false
+endFunction
